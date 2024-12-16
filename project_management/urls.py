@@ -56,6 +56,10 @@ urlpatterns = [
     # API routes
     path('api/', include((router.urls, 'api'), namespace='api')),
     
+    # Custom user routes
+    path('api/users/register/', UserViewSet.as_view({'post': 'create'}), name='user-register'),
+    path('api/users/login/', UserViewSet.as_view({'post': 'login'}), name='user-login'),
+
     # Authentication routes
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

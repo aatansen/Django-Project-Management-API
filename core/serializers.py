@@ -1,11 +1,30 @@
 from rest_framework import serializers
 from .models import User, Project, ProjectMember, Task, Comment
+from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'password']
         read_only_fields = ['id', 'date_joined']
+    
+    def create(self, validated_data):
+        """
+        Hashes the password before creating the user
+        """
+        validated_data['password'] = make_password(validated_data['password'])
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """
+        Hashes password when updating the user. If no password is provided, update other fields.
+        """
+        if 'password' in validated_data:
+            validated_data['password'] = make_password(validated_data['password'])
+        return super().update(instance, validated_data)
+    
 
 class ProjectSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)

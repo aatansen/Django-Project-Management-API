@@ -1,4 +1,7 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from .models import User, Project, ProjectMember, Task, Comment
 from .serializers import (
@@ -13,14 +16,50 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.action in ['create', 'login']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
     @extend_schema(
-        description="List all users",
-        responses={200: UserSerializer(many=True)}
+        description="Register a new user",
+        responses={201: UserSerializer()}
     )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    @action(detail=False, methods=['post'], url_path='register')
+    def register(self, request):
+        # Use the create method from the serializer
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        
+        # Generate tokens for the newly registered user
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'user': UserSerializer(user).data,
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        description="Authenticate a user and return a JWT token",
+    )
+    @action(detail=False, methods=['post'], url_path='login')
+    def login(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = User.objects.filter(username=username).first()
+
+        if user and user.check_password(password):
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'user': UserSerializer(user).data,
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """
