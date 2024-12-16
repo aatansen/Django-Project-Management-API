@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from .models import User, Project, ProjectMember, Task, Comment
 from .serializers import (
-    UserSerializer, ProjectSerializer, 
+    UserSerializer,LoginSerializer, ProjectSerializer, 
     ProjectMemberSerializer, TaskSerializer, CommentSerializer
 )
 from django.shortcuts import render
@@ -45,10 +45,14 @@ class UserViewSet(viewsets.ModelViewSet):
     @extend_schema(
         description="Authenticate a user and return a JWT token",
     )
-    @action(detail=False, methods=['post'], url_path='login')
+    @action(detail=False, methods=['post'], url_path='login',serializer_class=LoginSerializer)
     def login(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        username = serializer.validated_data.get('username')
+        password = serializer.validated_data.get('password')
+        
         user = User.objects.filter(username=username).first()
 
         if user and user.check_password(password):

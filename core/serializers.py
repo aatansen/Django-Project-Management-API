@@ -25,6 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['password'] = make_password(validated_data['password'])
         return super().update(instance, validated_data)
     
+class LoginSerializer(serializers.Serializer):
+    """
+    Serializer for user login that only includes username and password
+    """
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(
+        required=True, 
+        style={'input_type': 'password'},
+        write_only=True
+    )
 
 class ProjectSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
