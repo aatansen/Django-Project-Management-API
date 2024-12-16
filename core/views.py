@@ -48,6 +48,14 @@ class ProjectMemberViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectMemberSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_create(self, serializer):
+        """
+        Custom create method to handle project member creation
+        """
+        # Optionally, you can add additional logic here if needed
+        # For example, only allow project owners or admins to add members
+        serializer.save()
+
 class TaskViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing tasks
@@ -55,6 +63,16 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Custom create method to set the current user as the creator if not specified
+        """
+        # If no assigned_to is provided, default to the current user
+        if not serializer.validated_data.get('assigned_to'):
+            serializer.save(assigned_to=self.request.user)
+        else:
+            serializer.save()
 
     @extend_schema(
         description="List tasks",
@@ -81,6 +99,13 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Custom create method to set the current user as the comment author
+        """
+        # Set the current user as the comment author
+        serializer.save(user=self.request.user)
 
     @extend_schema(
         description="List comments",
