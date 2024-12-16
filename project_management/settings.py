@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'core',
-    'drf_spectacular',
+    # 'drf_spectacular',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -128,7 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -140,20 +141,17 @@ REST_FRAMEWORK = {
 }
 
 # Spectacular Settings
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Project Management API',
-    'DESCRIPTION': 'A comprehensive API for managing projects, tasks, and team collaboration',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SWAGGER_UI_SETTINGS': {
-        'deepLinking': True,
-        'persistAuthorization': True,
-    },
-}
-
-# Custom User Model
-AUTH_USER_MODEL = 'core.User'
+# SPECTACULAR_SETTINGS = {
+#     'TITLE': 'Project Management API',
+#     'DESCRIPTION': 'A comprehensive API for managing projects, tasks, and team collaboration',
+#     'VERSION': '1.0.0',
+#     'SERVE_INCLUDE_SCHEMA': True,
+#     'COMPONENT_SPLIT_REQUEST': True,
+#     'SWAGGER_UI_SETTINGS': {
+#         'deepLinking': True,
+#         'persistAuthorization': True,
+#     },
+# }
 
 # Custom User Model
 AUTH_USER_MODEL = 'core.User'
