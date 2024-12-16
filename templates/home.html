@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">{{ title }}</h1>
+        <p class="lead">{{ description }}</p>
+        <hr class="my-4">
+        <p>Explore our API endpoints and manage your projects efficiently.</p>
+    </div>
+
+    <div class="row">
+        {% for route in api_routes %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">{{ route.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ route.description }}</p>
+                    <ul class="list-group list-group-flush">
+                        {% for endpoint in route.endpoints %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="badge badge-primary mr-2">{{ endpoint.method }}</span>
+                            {{ endpoint.path }}
+                            <small class="text-muted">{{ endpoint.description }}</small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>API Routes</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="{% url 'api:user-list' %}" class="btn btn-outline-primary btn-sm mb-2">Users API</a></li>
+                                <li><a href="{% url 'api:project-list' %}" class="btn btn-outline-primary btn-sm mb-2">Projects API</a></li>
+                                <li><a href="{% url 'api:task-list' %}" class="btn btn-outline-primary btn-sm mb-2">Tasks API</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Authentication</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="{% url 'token_obtain_pair' %}" class="btn btn-outline-primary btn-sm mb-2">Obtain Token</a></li>
+                                <li><a href="{% url 'token_refresh' %}" class="btn btn-outline-primary btn-sm mb-2">Refresh Token</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Documentation</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="{% url 'swagger-ui' %}" class="btn btn-outline-info btn-sm mb-2">Swagger UI</a></li>
+                                <li><a href="{% url 'redoc' %}" class="btn btn-outline-info btn-sm mb-2">ReDoc</a></li>
+                                <li><a href="{% url 'schema' %}" class="btn btn-outline-info btn-sm mb-2">OpenAPI Schema</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
